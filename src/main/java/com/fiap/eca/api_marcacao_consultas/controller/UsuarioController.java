@@ -57,6 +57,25 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+    
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        try {
+            // Remove "Bearer " do header
+            String token = authHeader.substring(7);
+            
+            // Extrai o email do token
+            String email = jwtTokenProvider.obterEmailDoToken(token);
+            
+            // Busca o usuário pelo email
+            Usuario usuario = usuarioService.buscarPorEmail(email);
+            
+            return ResponseEntity.ok(usuario);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
+        }
+    }
+}
 
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
